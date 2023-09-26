@@ -1,39 +1,32 @@
 <?php
 require('database.php');
+session_start();
 
 if (isset($_POST['submit'])) {
-$username = $_POST['username'];
-$password = $_POST['password'];
+    $username = $_POST['username'];
+    $password = $_POST['password'];
 
-//to prevent from mysqli injection  
-$username = stripcslashes($username);
-$password = stripcslashes($password);
-$username = mysqli_real_escape_string($con, $username);
-$password = mysqli_real_escape_string($con, $password);
+    //to prevent from mysqli injection  
+    $username = stripslashes($_POST['username']);    // removes backslashes
+    $username = mysqli_real_escape_string($con, $username);
+    $password = stripslashes($_POST['password']);
+    $password = mysqli_real_escape_string($con, $password);
 
-$sql = "SELECT * FROM info WHERE username = '$username' and password = '$password'";
-$result = mysqli_query($con, $sql);
-$row = mysqli_fetch_array($result, MYSQLI_ASSOC);
-$count = mysqli_num_rows($result);
+    $sql = "SELECT * FROM info WHERE username = '$username' AND password = password='" . md5($password) . "'";
+    $result = mysqli_query($con, $sql);
+    $count = mysqli_num_rows($result);
 
-if ($count == 1) {
-    echo '<script type="text/javascript">
-    $(document).ready(function(){
-    Swal.fire({
-        icon: "success",
-        titleText: "Login Successfully!",
-        showConfirmButton: false,
-        timer: 2000,
-        hideClass: {
-          popup: "animate__animated animate__fadeOutUp",
-        },
-      })
-    });
-    </script>';
-    header("location: index.php");
+    if ($count == 1) {
+        $_SESSION['username'] = $username;
+        // Redirect to user dashboard page
+        header("location: index.php");
+    } else {
+        echo "<div class='form'>
+              <h3>Incorrect Username/password.</h3><br/>
+              <p class='link'>Click here to <a href='login.php'>Login</a> again.</p>
+              </div>";
+    }
 } else {
-    echo "<h1> Login failed. Invalid username or password.</h1>";
-}
 }
 ?>
 
@@ -59,7 +52,7 @@ if ($count == 1) {
                 <h1 class="login-title">Login</h1>
                 <input type="text" name="username" placeholder="username" />
                 <input type="password" name="password" placeholder="password" />
-                <input type="submit" value="LOGIN" class="button">
+                <input type="submit" name="submit" value="LOGIN" class="button">
 
                 <p class="message">Not registered? <a href="register.php">Create an account</a></p>
             </form>
