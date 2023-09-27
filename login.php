@@ -1,63 +1,75 @@
-<?php
-require('database.php');
-session_start();
-
-if (isset($_POST['submit'])) {
-    $username = $_POST['username'];
-    $password = $_POST['password'];
-
-    //to prevent from mysqli injection  
-    $username = stripslashes($_POST['username']);    // removes backslashes
-    $username = mysqli_real_escape_string($con, $username);
-    $password = stripslashes($_POST['password']);
-    $password = mysqli_real_escape_string($con, $password);
-
-    $sql = "SELECT * FROM info WHERE username = '$username' AND password = password='" . md5($password) . "'";
-    $result = mysqli_query($con, $sql);
-    $count = mysqli_num_rows($result);
-
-    if ($count == 1) {
-        $_SESSION['username'] = $username;
-        // Redirect to user dashboard page
-        header("location: index.php");
-    } else {
-        echo "<div class='form'>
-              <h3>Incorrect Username/password.</h3><br/>
-              <p class='link'>Click here to <a href='login.php'>Login</a> again.</p>
-              </div>";
-    }
-} else {
-}
-?>
-
 <!DOCTYPE html>
-<html lang="en">
+<html>
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CRUD</title>
-
-    <link rel="stylesheet" href="style.css">
+    <meta charset="utf-8" />
+    <title>Login</title>
+    <link rel="stylesheet" href="style.css" />
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js" integrity="sha384-cuYeSxntonz0PPNlHhBs68uyIAVpIIOZZ5JqeqvYYIcEL727kskC66kF92t6Xl2V" crossorigin="anonymous"></script>
+    <script src="sweetalert2.all.min.js"></script>
+    <script src="sweetalert2.min.js"></script>
+    <link rel="stylesheet" href="sweetalert2.min.css">
     <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
 </head>
 
 <body>
-    <div class="login-page">
-        <div class="form">
-            <form class="login-form" method="post" enctype="multipart/form-data">
-                <h1 class="login-title">Login</h1>
-                <input type="text" name="username" placeholder="username" />
-                <input type="password" name="password" placeholder="password" />
-                <input type="submit" name="submit" value="LOGIN" class="button">
-
+    <?php
+    require('database.php');
+    session_start();
+    // When form submitted, check and create user session.
+    if (isset($_REQUEST['username'])) {
+        $username = stripslashes($_REQUEST['username']);    // removes backslashes
+        $username = mysqli_real_escape_string($con, $username);
+        $password = stripslashes($_REQUEST['password']);
+        $password = mysqli_real_escape_string($con, $password);
+        // Check user is exist in the database
+        $query    = "SELECT * FROM info WHERE username='$username'
+                     AND password='" . md5($password) . "'";
+        $result = mysqli_query($con, $query) or die();
+        $rows = mysqli_num_rows($result);
+        if ($rows == 1) {
+            $_SESSION['username'] = $username;
+            // Redirect to user dashboard page
+            header("location: home.php");
+        } else {
+            echo "
+            <div class='login-page'>
+            <div class='form'>
+                  <h3 style='text-align: center; font-size: 20px;'>Invalid Username or Password.</h3><br/>
+                  <button class='back'><a class='link' href='login.php'>Back to Login</a></button>
+                  </div>
+                  </div>";
+        }
+    } else {
+    ?>
+        <div class="login-page">
+            <form class="form" method="post" name="login">
+                <h1 class="login-title">LOGIN</h1>
+                <span id="username" class="form-label">Username</span>
+                <input type="text" class="login-input" name="username" autofocus="true" />
+                <span id="password" class="form-label">Password</span>
+                <input type="password" class="login-input" name="password" />
+                <!-- <div class="ml-2">
+                    <input type="checkbox" onclick="myFunction()"> Show Password
+                </div> -->
+                <input type="submit" value="Login" name="submit" class="button" />
                 <p class="message">Not registered? <a href="register.php">Create an account</a></p>
             </form>
         </div>
-    </div>
+    <?php
+    }
+    ?>
 </body>
 
 </html>
+
+<!-- <script>
+    function myFunction() {
+        var x = document.getElementById("password");
+        if (x.type === "password") {
+            x.type = "text";
+        } else {
+            x.type = "password";
+        }
+    }
+</script> -->

@@ -14,13 +14,16 @@
 
 <body>
     <div class="login-page">
-        <form class="form" action="" method="post" enctype="multipart/form-data">
-            <h1 class="login-title">Registration</h1>
-            <input type="text" class="login-input" name="name" placeholder="Name" required />
-            <input type="text" class="login-input" name="username" placeholder="Username">
-            <input type="password" class="login-input" name="password" placeholder="Password">
+        <form class="form" action="login.php" method="post" enctype="multipart/form-data">
+            <h1 class="login-title">REGISTER</h1>
+            <span class="form-label">Name</span>
+            <input type="text" class="login-input" name="name" required />
+            <span class="form-label">Username</span>
+            <input type="text" class="login-input" name="username">
+            <span class="form-label">Password</span>
+            <input type="password" class="login-input" name="password">
             <button type="submit" name="submit" class="button">Register</button>
-            <p class="message">Not registered? <a href="login.php">Login</a></p>
+            <p class="message">Already have an account? <a href="login.php">Login</a></p>
         </form>
     </div>
 </body>
